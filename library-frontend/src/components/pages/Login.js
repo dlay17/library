@@ -10,16 +10,21 @@ export const Login = () => {
      const [ errorMessage, setErrorMessage ] = useState(null)
      
      const doLogin = async () => {
-
-          try {
-               
-               await login(formData.userName, formData.password)
-               navigate("/account")
-
-          } catch (error) {
-
-               setErrorMessage(error)
-               
+          if (formData.userName) {
+               // Check if the username is an email using a regular expression
+               const isEmail = /^\w+([-+.']\w+)*@[A-Za-z\d]+\.com$/.test(formData.userName);
+           
+               if (isEmail) {
+                 try {
+                   await login(formData.userName, formData.password);
+                   navigate("/account");
+                 } catch (error) {
+                   setErrorMessage(error);
+                 }
+               } else {
+                 // Username is not a valid email
+                 setErrorMessage("Please enter a valid email address (emails must end in .com)");
+               }
           }
           
      }
@@ -29,7 +34,7 @@ export const Login = () => {
                <h2>Login page</h2>
                <div className="inputs">
                     <div className="input">
-                        Username: 
+                        Email: 
                         <input value={formData.userName} onChange={(e) => setFormData({userName: e.target.value}) } type="text"/>
                     </div>
                     <div className="input">

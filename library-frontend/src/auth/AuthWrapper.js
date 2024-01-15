@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react"
 import { RenderHeader } from "../components/structure/Header";
 import { RenderMenu, RenderRoutes } from "../components/structure/RenderNavigation";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 export const AuthData = () => useContext(AuthContext);
@@ -12,52 +13,74 @@ export const AuthWrapper = () => {
     const [ user, setUser ] = useState({name: "", isAuthenticated: false})
 
     const login = (userName, password) => {
-
-        // Make a call to the authentication API to check the username
-          
-        return new Promise((resolve, reject) => {
-
-            if (password === "password") {
-                setUser({name: userName, isAuthenticated: true})
-                resolve("success")
-            } else {
-                reject("Incorrect password")
-            }
-        })
-          
-          
-     }
-
-    const signup = (userName, password) => {
         return new Promise(async (resolve, reject) => {
           try {
-            const response = await fetch(LOGIN_API_URL + "/sign_up", { // Move the parenthesis here
+            const response = await fetch(LOGIN_API_URL + "/sign_in", {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                userName,
-                password,
+                'email': userName,
+                'password': password,
               }),
             });
-      
+
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+                // Was unable to retrieve an error message (possibly cors related)
+                if(response.status == 401){
+                    reject("Email or Password was incorrect");
+                }
+                reject("An error occurred during signup")
             }
       
-            const data = await response.json();
-            resolve(data);
+            // If the response is okay, proceed with resolving the promise
+            setUser({ name: userName, isAuthenticated: true });
+            resolve("success");
           } catch (error) {
-            reject(error);
+            // Handle unexpected errors, e.g., network issues, in the catch block
+            reject({ message: 'An error occurred during signup' });
+          }
+        });
+    };
+
+    const signup = (userName, password) => {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const response = await fetch(LOGIN_API_URL + "/sign_up", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                'email': userName,
+                'password': password,
+              }),
+            });
+
+            if (!response.ok) {
+                // Was unable to retrieve an error message (possibly cors related)
+                if(response.status == 422){
+                    reject("Email address already exists");
+                }
+                reject("An error occurred during signup")
+            }
+      
+            // If the response is okay, proceed with resolving the promise
+            setUser({ name: userName, isAuthenticated: true });
+            resolve("success");
+          } catch (error) {
+            // Handle unexpected errors, e.g., network issues, in the catch block
+            reject({ message: 'An error occurred during signup' });
           }
         });
     };
       
+      
+      
 
     const logout = () => {
-
-          setUser({...user, isAuthenticated: false})
+        setUser({...user, isAuthenticated: false})
     }
 
 

@@ -45,7 +45,7 @@ export const RenderRoutes = () => {
                             )
                        } else return false
                   } )}
-   
+                  
                   { user.isAuthenticated ?
                   <div className="menuItem"><Link to={'#'} onClick={logout}>Log out</Link></div>
                   :
