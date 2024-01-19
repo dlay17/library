@@ -1,73 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
-const FileUpload = () => {
-  const [files, setFiles] = useState(null);
+const API_URL = "http://localhost:3000";
+
+function FileUpload() {
   const [status, setStatus] = useState("initial");
 
-  const handleFileChange = (e) => {
-    if (e.target.files) {
-      setStatus("initial");
-      setFiles(e.target.files);
+  const [files, setFiles] = useState([]);
+  const filesRef = useRef([]);
+  const postToGet = useRef(1);
+
+  const handleUpload = (e) => {
+    e.preventDefault();
+    setStatus("uploading");
+    const formData = new FormData();
+    formData.append("post[title]", "Test");
+
+    for (let i = 0; i < filesRef.current.files.length; i++) {
+      formData.append("post[files][]", filesRef.current.files[i]);
     }
+    postData(formData);
   };
 
-  const handleUpload = async () => {
-    if (files) {
-      setStatus("uploading");
-
-      const formData = new FormData();
-
-      Array.from(files).forEach((file) => {
-        formData.append("files", file);
-      });
-
-      try {
-        const result = await fetch("https://httpbin.org/post", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await result.json();
-
+  const postData = (formData) => {
+    fetch(`${API_URL}/posts`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
         console.log(data);
         setStatus("success");
-      } catch (error) {
-        console.error(error);
+      })
+      .catch((err) => {
+        console.error(err);
         setStatus("fail");
-      }
-    }
+      })
   };
 
   return (
     <>
-      <div className="input-group">
-        <label htmlFor="file" className="sr-only">
-          Choose files
-        </label>
-        <input id="file" type="file" multiple onChange={handleFileChange} />
-      </div>
-      {files &&
-        Array.from(files).map((file, index) => (
-          <section key={file.name}>
-            File number {index + 1} details:
-            <ul>
-              <li>Name: {file.name}</li>
-              <li>Type: {file.type}</li>
-              <li>Size: {file.size} bytes</li>
-            </ul>
-          </section>
-        ))}
-
-      {files && (
-        <button onClick={handleUpload} className="submit">
-          Upload {files.length > 1 ? "files" : "a file"}
+    <div className="App">
+      {/* upload form */}
+      <form>
+        <input type="file" name="file" multiple ref={filesRef} />
+        <button type="button" onClick={handleUpload}>
+          Submit
         </button>
-      )}
-
-      <Result status={status} />
+      </form>
+    </div>
+    <Result status={status} />
     </>
-  );
-};
+ );
+}
 
 const Result = ({ status }) => {
   if (status === "success") {
@@ -80,5 +64,6 @@ const Result = ({ status }) => {
     return null;
   }
 };
+
 
 export default FileUpload;

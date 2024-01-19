@@ -3,7 +3,7 @@ import { Home } from "../pages/Home"
 import { Login } from "../pages/Login"
 import { Signup } from "../pages/Signup"
 import FileUpload from "../pages/FileUpload"
-import { FileDownload } from "../pages/FileDownload"
+import FileDownload from "../pages/FileDownload"
 
 export const nav = [
      { path:     "/",               name: "Home",           element: <Home />,          isMenu: true,     isPrivate: false  },

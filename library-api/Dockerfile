@@ -7,6 +7,9 @@ FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
 # Rails app lives here
 WORKDIR /rails
 
+# Set the SSL_CERT_FILE environment variable to point to the CA certificates
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
 # Set production environment
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
