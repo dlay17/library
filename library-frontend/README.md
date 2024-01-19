@@ -21,7 +21,7 @@ This will build a docker image using the docker file in which you can run the fr
 ### `docker run`
 
 To run the image in a container, run the following command:
-docker run -dp 8000:3000 --name libraryf libraryf:latest
+docker run -dp 8000:3005 --name libraryf libraryf:latest
 
 To verify that the container is up and running, run docker ps to verify
 
